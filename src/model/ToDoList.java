@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ToDoList implements Loadable, Savable {
-    Task task;
 
     @Override
     //REQUIRES: output is not null
@@ -21,10 +20,9 @@ public class ToDoList implements Loadable, Savable {
         PrintWriter writer = new PrintWriter(output, "UTF-8");
         for (Task t : toDoList) {
             List<String> lines = Files.readAllLines(Paths.get(output));
-            lines.add(t.getName() + " " + t.getImportanceLvl());
+            lines.add(t.getName() + " " + t.getImportanceLvl()+" " +t.getType());
 
             for (String line : lines) {
-               // ArrayList<String> partsOfLine = splitOnSpace(line);
                 writer.println(line);
             }
         }
@@ -35,54 +33,54 @@ public class ToDoList implements Loadable, Savable {
     //MODIFIES: this
     // EFFECTS: returns list of tasks from the output file
     public ArrayList<Task> load(String output) throws IOException {
+        Task t = new RegularTask("","","");
         List<String> lines = Files.readAllLines(Paths.get(output));
         ArrayList<Task> loadedList = new ArrayList<>();
         for (String s: lines){
             ArrayList<String> partsOfLine = splitOnSpace(s);
-            Task t = new Task(partsOfLine.get(0), partsOfLine.get(1));
+            if (partsOfLine.get(2).equals("Regular")){
+                t = new RegularTask(partsOfLine.get(0), partsOfLine.get(1), partsOfLine.get(2));
+            }
+            {}
+            if (partsOfLine.get(2).equals("School")) {
+                t = new SchoolTask(partsOfLine.get(0), partsOfLine.get(1), partsOfLine.get(2));
+            }
             loadedList.add(t);
 
         }
         return loadedList;
 
     }
-
+    // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
     public Task newToDo(Scanner scanner){
+        Task task = new RegularTask("","","");
         System.out.println("Please enter the task to do");
         String newTask = scanner.nextLine();
-        String actualLevel = "";
+        String type= "";
         if (!newTask.equals("")) {
-            System.out.println("Please enter the level of importance: [1] urgent, [2] medium, or [3] low");
+            System.out.println("Please enter which type of Task you want to enter: [1] Regular Task, [2] School Task");
             int level = scanner.nextInt();
 
             if (level == 1) {
-                actualLevel = "urgent";
-            }
-            {
-                ;
+                type = "Regular";
             }
             if (level == 2) {
-                actualLevel = "medium";
+                type = "School";
             }
-            {
-                ;
-            }
-            if (level == 3) {
-                actualLevel = "low";
-            }
-            {
-                ;
-            }
+            {}
+
             scanner.nextLine();
         }
-        {
-            ;
+        {}
+        if (type.equals("Regular")){
+            task = new RegularTask(newTask, getNewLevel(newTask, scanner), type);
         }
-        task = new Task(newTask, actualLevel);
+        if (type.equals("School")){
+        task = new SchoolTask(newTask, getNewLevel(newTask, scanner), type);}
+        {}
         return task;
-        // tasks.addTask(newTask,actualLevel);
     }
 
 
@@ -137,12 +135,80 @@ public class ToDoList implements Loadable, Savable {
 
     }
 
+    public void printList(Scanner scanner, ArrayList<Task> sortedList){
+        boolean done = false;
+        Task rt = new RegularTask("","","");
+        Task st = new SchoolTask("","","");
+        System.out.println("Which list of tasks do you want to see: [1] All Tasks, [2] Regular Tasks, [3] School Tasks");
+         int typeList = scanner.nextInt();
+         scanner.nextLine();
+        if (typeList == 1){
+            System.out.println("All tasks left to complete:");
+            for (Task t : sortedList) {
+                System.out.println(t.getName()+" : "+t.getImportanceLvl());
+            }
+        }
+         if (typeList == 2){
+             System.out.println("Regular tasks left to complete:");
+             for (Task t : sortedList){
+                 if (t.getType().equals("Regular")){
+                      System.out.println(t.getName()+" : "+t.getImportanceLvl());
+                      done = true;
+                     }
+                 }
+                 if (!done){
+                     System.out.println(rt.done());
+             }
+             }
+        if (typeList == 3){
+            System.out.println("School tasks left to complete:");
+            for (Task t : sortedList){
+                if (t.getType().equals("School")){
+                    System.out.println(t.getName()+" : "+t.getImportanceLvl());
+                    done = true;
+                }
+            }
+            if (!done){
+                System.out.println(st.done());
+            }
+
+        }
+        {}
+
+    }
+
 
 
     private static ArrayList<String> splitOnSpace(String line){
         String[] splits = line.split(" ");
         return new ArrayList<>(Arrays.asList(splits));
     }
+
+    private String getNewLevel(String newTask, Scanner scanner){
+        String actualLevel= "";
+        if (!newTask.equals("")) {
+            System.out.println("Please enter the level of importance: [1] urgent, [2] medium, or [3] low");
+            int level = scanner.nextInt();
+
+            if (level == 1) {
+                actualLevel = "urgent";
+            }
+            if (level == 2) {
+                actualLevel = "medium";
+            }
+            if (level == 3) {
+                actualLevel = "low";
+            }
+            {}
+
+            scanner.nextLine();
+        }
+        {}
+        return actualLevel;
+
+    }
+
+
 
 
 }

@@ -1,36 +1,32 @@
 package model;
 
-public class Task // Implements OTher{
-{
+public abstract class Task {
+    protected String name = "";
+    protected String importanceLvl = "";
+    protected String type = "";
 
-    String name = "";
-    String importanceLvl = "";
 
-    // MODIFIES: this
-    // EFFECTS: returns a new Task
-
-    //@Override on getname and getimptlvl
-    public Task addTask(String taskAdded, String level){
-        return new Task(taskAdded, level);
-
-    }
-
-    // EFFECTS: return the Task's importance level
+    // EFFECTS: return the RegularTask's importance level
     public String getImportanceLvl (){
-        return importanceLvl;
+        return this.importanceLvl;
     }
     // REQUIRES: name cannot be empty
-    // EFFECTS: returns Task's name
+    // EFFECTS: returns RegularTask's name
     public String getName(){
-        return name;
+        return this.name;
     }
-
-    // REQUIRES: operation and name is not empty
-    // MODIFIES: this
-    // EFFECTS: constructs new Task with name and importance level
-    public Task (String name, String importanceLvl){
+    // EFFECTS: returns Task type
+    public String getType(){
+        return this.type;
+    }
+    //
+    public void setName(String name){
         this.name = name;
-        this.importanceLvl = importanceLvl;
+    }
+    public void setImportanceLevel(String lvl){
+        this.importanceLvl = lvl;
     }
 
+    // Abstract method
+    public abstract String done();
 }

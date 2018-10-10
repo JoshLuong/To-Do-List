@@ -18,8 +18,8 @@ public class TestLoadable {
         Loadable load = new ToDoList();
         assertTrue(load.load("loadTestOutputfile.txt").size()== 2);
         List<String> line = Files.readAllLines(Paths.get("loadTestOutputfile.txt"));
-        assertTrue(line.get(0).equals("shop urgent"));
-        assertTrue(line.get(1).equals("homework low"));
+        assertTrue(line.get(0).equals("shop urgent Regular"));
+        assertTrue(line.get(1).equals("homework low School"));
         testLoad(load);
     }
 

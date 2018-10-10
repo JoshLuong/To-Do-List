@@ -1,2 +1,2 @@
-shop urgent
-homework low
+shop urgent Regular
+homework low School

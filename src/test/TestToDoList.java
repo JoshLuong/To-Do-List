@@ -1,16 +1,16 @@
 package test;
 
 import model.Task;
+import model.RegularTask;
+import model.SchoolTask;
 import model.ToDoList;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// no tests for UI portion
+
 
 public class TestToDoList {
 
@@ -31,8 +31,8 @@ public class TestToDoList {
     public void testSortedListSome(){
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
-        Task task1 = new Task("shop", "urgent");
-        Task task2 = new Task("homework", "low");
+        Task task1 = new RegularTask("shop", "urgent","Regular");
+        Task task2 = new RegularTask("homework", "low", "Regular");
         tasks.add(task1);
         tasks.add(task2);
         ArrayList<Task> newList = toDoList.sortedList(tasks);
@@ -47,8 +47,8 @@ public class TestToDoList {
     public void testSortedListMixed(){
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
-        Task task1 = new Task("shop", "low");
-        Task task2 = new Task("homework", "urgent");
+        Task task1 = new RegularTask("shop", "low","Regular");
+        Task task2 = new SchoolTask("homework", "urgent","School");
         tasks.add(task1);
         tasks.add(task2);
         ArrayList<Task> newList = toDoList.sortedList(tasks);
@@ -63,11 +63,11 @@ public class TestToDoList {
     public void testSortedListMore(){
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
-        Task task1 = new Task("shop", "low");
-        Task task2 = new Task("math", "urgent");
-        Task task3 = new Task("biology", "medium");
-        Task task4 = new Task("chemistry", "low");
-        Task task5 = new Task("essay", "urgent");
+        Task task1 = new RegularTask("shop", "low","Regular");
+        Task task2 = new SchoolTask("math", "urgent","School");
+        Task task3 = new SchoolTask("biology", "medium","School");
+        Task task4 = new SchoolTask("chemistry", "low", "School");
+        Task task5 = new SchoolTask("essay", "urgent","School");
         tasks.add(task1);
         tasks.add(task2);
         tasks.add(task3);
