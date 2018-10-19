@@ -1,10 +1,15 @@
 package model;
 
 public abstract class Task {
-    protected String name = "";
-    protected String importanceLvl = "";
-    protected String type = "";
+    protected String name;
+    protected String importanceLvl;
+    protected String type;
 
+    public Task (String name, String importanceLvl, String type){
+        this.name = name;
+        this.importanceLvl = importanceLvl;
+        this.type = type;
+    }
 
     // EFFECTS: return the RegularTask's importance level
     public String getImportanceLvl (){
@@ -29,4 +34,6 @@ public abstract class Task {
 
     // Abstract method
     public abstract String done();
+
+    public abstract String getSubject();
 }

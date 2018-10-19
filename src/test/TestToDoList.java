@@ -31,8 +31,8 @@ public class TestToDoList {
     public void testSortedListSome(){
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
-        Task task1 = new RegularTask("shop", "urgent","Regular");
-        Task task2 = new RegularTask("homework", "low", "Regular");
+        Task task1 = new RegularTask("shop", "urgent");
+        Task task2 = new RegularTask("homework", "low");
         tasks.add(task1);
         tasks.add(task2);
         ArrayList<Task> newList = toDoList.sortedList(tasks);
@@ -47,8 +47,8 @@ public class TestToDoList {
     public void testSortedListMixed(){
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
-        Task task1 = new RegularTask("shop", "low","Regular");
-        Task task2 = new SchoolTask("homework", "urgent","School");
+        Task task1 = new RegularTask("shop", "low");
+        Task task2 = new SchoolTask("homework", "urgent", "biology");
         tasks.add(task1);
         tasks.add(task2);
         ArrayList<Task> newList = toDoList.sortedList(tasks);
@@ -63,7 +63,7 @@ public class TestToDoList {
     public void testSortedListMore(){
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
-        Task task1 = new RegularTask("shop", "low","Regular");
+        Task task1 = new RegularTask("shop", "low");
         Task task2 = new SchoolTask("math", "urgent","School");
         Task task3 = new SchoolTask("biology", "medium","School");
         Task task4 = new SchoolTask("chemistry", "low", "School");

@@ -1,18 +1,25 @@
 package model;
 
 public class SchoolTask extends Task {
-    public SchoolTask (String name, String importanceLvl, String type){
-        this.name = name;
-        this.importanceLvl = importanceLvl;
-        this.type = type;
+    String subject;
+
+    public SchoolTask (String name, String importanceLvl, String subject){
+        super(name ,importanceLvl, "School");
+        this.subject = subject;
+
     }
 
 
     @Override
     //EFFECTS: returns string specific to SchoolTask
     public String done() {
-        return "You've finished all of your homework, NERD!";
+        return "\nYou've finished all of your homework, NERD!";
 
+    }
+
+    @Override
+    public String getSubject() {
+        return subject;
     }
 
 

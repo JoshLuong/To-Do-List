@@ -1,5 +1,8 @@
 package model;
 
+import exceptions.AlreadyInList;
+import exceptions.NullOutputException;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -9,14 +12,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class ToDoList implements Loadable, Savable {
 
+
     @Override
-    //REQUIRES: output is not null
+    //REQUIRES: output is "outputfile.txt"
     // MODIFIES: this
     // EFFECTS: saves tasks in todoList into the output file
-    public void save(ArrayList<Task> toDoList, String output) throws IOException {
+    public void save(ArrayList<Task> toDoList, String output) throws IOException, NullOutputException {
 
+        if (!output.equals("outputfile.txt") &&	 !(output.equals("saveTestOutputfile.txt"))){
+            throw new NullOutputException();
+        }
         PrintWriter writer = new PrintWriter(output, "UTF-8");
         for (Task t : toDoList) {
             List<String> lines = Files.readAllLines(Paths.get(output));
@@ -33,17 +41,17 @@ public class ToDoList implements Loadable, Savable {
     //MODIFIES: this
     // EFFECTS: returns list of tasks from the output file
     public ArrayList<Task> load(String output) throws IOException {
-        Task t = new RegularTask("","","");
+        Task t = new RegularTask("","");
         List<String> lines = Files.readAllLines(Paths.get(output));
         ArrayList<Task> loadedList = new ArrayList<>();
         for (String s: lines){
             ArrayList<String> partsOfLine = splitOnSpace(s);
             if (partsOfLine.get(2).equals("Regular")){
-                t = new RegularTask(partsOfLine.get(0), partsOfLine.get(1), partsOfLine.get(2));
+                t = new RegularTask(partsOfLine.get(0), partsOfLine.get(1));
             }
             {}
             if (partsOfLine.get(2).equals("School")) {
-                t = new SchoolTask(partsOfLine.get(0), partsOfLine.get(1), partsOfLine.get(2));
+                t = new SchoolTask(partsOfLine.get(0), partsOfLine.get(1),partsOfLine.get(2));
             }
             loadedList.add(t);
 
@@ -54,34 +62,28 @@ public class ToDoList implements Loadable, Savable {
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
-    public Task newToDo(Scanner scanner){
-        Task task = new RegularTask("","","");
+    public Task newToDo(Scanner scanner, ArrayList<Task> toDoList) throws AlreadyInList {
+        Task task = new RegularTask("","");
         System.out.println("Please enter the task to do");
         String newTask = scanner.nextLine();
         String type= "";
         if (!newTask.equals("")) {
-            System.out.println("Please enter which type of Task you want to enter: [1] Regular Task, [2] School Task");
-            int level = scanner.nextInt();
-
-            if (level == 1) {
-                type = "Regular";
-            }
-            if (level == 2) {
-                type = "School";
-            }
-            {}
-
-            scanner.nextLine();
+            type = selectType(scanner);
         }
-        {}
         if (type.equals("Regular")){
-            task = new RegularTask(newTask, getNewLevel(newTask, scanner), type);
+            task = new RegularTask(newTask, getNewLevel(newTask, scanner));
         }
         if (type.equals("School")){
-        task = new SchoolTask(newTask, getNewLevel(newTask, scanner), type);}
+        task = new SchoolTask(newTask, getNewLevel(newTask, scanner), getSubject(scanner));}
         {}
+
+        if (isSameInList(task, toDoList)){
+            throw new AlreadyInList();
+        }
+
         return task;
     }
+
 
 
 
@@ -90,9 +92,10 @@ public class ToDoList implements Loadable, Savable {
     public void crossOff(Scanner scanner, ArrayList<Task> toDoList){
         System.out.println("Please enter the task completed");
         String search = scanner.nextLine();
+        String type = selectType(scanner);
         ArrayList<Task> cloned = (ArrayList) toDoList.clone();
         for (Task t : cloned){
-            if (t.getName().equals(search)){
+            if (t.getName().equals(search) && t.getType().equals(type)){
                 toDoList.remove(t);
             }
 
@@ -137,7 +140,7 @@ public class ToDoList implements Loadable, Savable {
 
     public void printList(Scanner scanner, ArrayList<Task> sortedList){
         boolean done = false;
-        Task rt = new RegularTask("","","");
+        Task rt = new RegularTask("","");
         Task st = new SchoolTask("","","");
         System.out.println("Which list of tasks do you want to see: [1] All Tasks, [2] Regular Tasks, [3] School Tasks");
          int typeList = scanner.nextInt();
@@ -164,7 +167,7 @@ public class ToDoList implements Loadable, Savable {
             System.out.println("School tasks left to complete:");
             for (Task t : sortedList){
                 if (t.getType().equals("School")){
-                    System.out.println(t.getName()+" : "+t.getImportanceLvl());
+                    System.out.println(t.getSubject()+" "+t.getName()+" : "+t.getImportanceLvl());
                     done = true;
                 }
             }
@@ -207,6 +210,40 @@ public class ToDoList implements Loadable, Savable {
         return actualLevel;
 
     }
+
+    private boolean isSameInList(Task task, ArrayList<Task> toDoList){
+        for (Task str : toDoList){
+            if (task.getName().equals(str.getName())  && task.getType().equals(str.getType())){
+                return true;
+            }
+
+        }
+        return false;
+
+    }
+
+    private String selectType(Scanner scanner){
+        String type="";
+        System.out.println("Please enter the Task's type: [1] Regular Task, [2] School Task");
+        int level = scanner.nextInt();
+        if (level == 1) {
+            type = "Regular";
+        }
+        if (level == 2) {
+            type = "School";
+        }
+        {}
+
+        scanner.nextLine();
+        return type;
+    }
+
+    private String getSubject(Scanner scanner){
+        System.out.println("What is the subject associated with the School Task?");
+        String subject = scanner.nextLine();
+        return subject;
+    }
+
 
 
 

@@ -2,6 +2,8 @@
 
 package ui;
 
+import exceptions.AlreadyInList;
+import exceptions.NullOutputException;
 import model.Task;
 import model.ToDoList;
 
@@ -12,10 +14,11 @@ import java.util.Scanner;
 public class ToDoListRun {
     private model.ToDoList newToDoList = new model.ToDoList();
     public Task task;
+    private final String FILE = "outputfile.txt";
 
     private Scanner scanner = new Scanner(System.in);
 
-    ArrayList<Task> toDoList = newToDoList.load("outputfile.txt");
+    public ArrayList<Task> toDoList = newToDoList.load("outputfile.txt");
 
 
     private ToDoListRun() throws IOException {
@@ -25,15 +28,19 @@ public class ToDoListRun {
 
             ToDoList newToDoList = new ToDoList();
 
-            System.out.println("                  ------Welcome to 'Task Manager'------");
-            System.out.println("Please select an option: [1] to-do, [2] cross-off or [3] print sorted to-do list");
+            System.out.println("\n                  ------Welcome to 'Task Manager'------");
+            System.out.println("Please select an option: [1] to-do, [2] cross-off or [3] print sorted to-do list\n\n");
             operation = scanner.nextLine();
-            System.out.println("");
 
 
 
             if (operation.equals("1")) {
-                task = newToDoList.newToDo(scanner);
+                try {
+                    task = newToDoList.newToDo(scanner, toDoList);
+                } catch (AlreadyInList alreadyInList) {
+                    alreadyInList.printStackTrace();
+                    System.out.println("This task is already in the list!");
+                }
                 toDoList.add(task);
 
                if (task.getImportanceLvl().equals(""))
@@ -63,7 +70,14 @@ public class ToDoListRun {
         System.out.println("");
         System.out.println("    -----Have a productive day!-----");
         newToDoList.printStatement(toDoList);
-        newToDoList.save(toDoList, "outputfile.txt");
+
+
+        try {
+            newToDoList.save(toDoList, FILE);
+        } catch (NullOutputException nullOutputException) {
+            nullOutputException.printStackTrace();
+            System.out.println("\nNo FILE exists!");
+        }
 
     }
 

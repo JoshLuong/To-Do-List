@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public abstract  class TestTask {
-    Task t;
-    String name ="";
-    String importanceLvl ="";
+public abstract class TestTask {
+    protected Task t;
+    protected String name ="";
+    protected String importanceLvl ="";
+
+    protected String subject="";
 
     // tests that an importance level is ""
     @Test
