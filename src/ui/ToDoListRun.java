@@ -12,13 +12,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ToDoListRun {
-    private model.ToDoList newToDoList = new model.ToDoList();
-    public Task task;
     private final String FILE = "outputfile.txt";
 
+    private model.ToDoList newToDoList = new model.ToDoList();
+    private Task task;
     private Scanner scanner = new Scanner(System.in);
-
-    public ArrayList<Task> toDoList = newToDoList.load("outputfile.txt");
+    private ArrayList<Task> toDoList = newToDoList.load("outputfile.txt");
 
 
     private ToDoListRun() throws IOException {
@@ -37,18 +36,26 @@ public class ToDoListRun {
             if (operation.equals("1")) {
                 try {
                     task = newToDoList.newToDo(scanner, toDoList);
+                    System.out.println("task " +task.getName());
+
+                    if (task.getImportanceLvl().equals(""))
+                    {
+                        System.out.println("   ... cannot be added to the to-do list");
+                    }
+                    else {
+                        System.out.println("   ... was added to the to-do list");}
                 } catch (AlreadyInList alreadyInList) {
-                    alreadyInList.printStackTrace();
+                  //  alreadyInList.printStackTrace();
                     System.out.println("This task is already in the list!");
+
+                }
+                finally {
+                    System.out.println("\nDon't procrastinate!");
                 }
                 toDoList.add(task);
 
-               if (task.getImportanceLvl().equals(""))
-               {
-                   System.out.println("task :  "+task.getName()+" cannot be added");
-               }
-               else {
-                System.out.println("you added " + task.getName() + " to the to-do list");}
+
+
             }
 
             if (operation.equals("2")) {
@@ -67,16 +74,16 @@ public class ToDoListRun {
 
 
         }
-        System.out.println("");
-        System.out.println("    -----Have a productive day!-----");
-        newToDoList.printStatement(toDoList);
-
-
         try {
             newToDoList.save(toDoList, FILE);
         } catch (NullOutputException nullOutputException) {
             nullOutputException.printStackTrace();
             System.out.println("\nNo FILE exists!");
+        }
+        finally {
+            System.out.println("");
+            System.out.println("     -----Have a productive day!-----");
+            newToDoList.printStatement(toDoList);
         }
 
     }

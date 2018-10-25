@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 // TEST https://stackoverflow.com/questions/156503/how-do-you-assert-that-a-certain-exception-is-thrown-in-junit-4-tests
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -33,18 +32,17 @@ public class TestSavable {
     }
     @Test
     public void testSaveExceptionWithNoOutput() throws IOException {
-        boolean thrown = false;
         ArrayList<Task> tasks = new ArrayList<>();
         RegularTask task = new RegularTask("eat","urgent");
         tasks.add(task);
         Savable save = new ToDoList();
         try{
-        save.save(tasks, "null.txt");}
+        save.save(tasks, "null.txt");
+        fail("Shouldn't catch");
+        }
 
         catch (NullOutputException e){
-            thrown = true;
         }
-        assertTrue(thrown);
 
     }
 }

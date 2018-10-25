@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 public abstract class Task {
     protected String name;
     protected String importanceLvl;
@@ -31,6 +33,8 @@ public abstract class Task {
     public void setImportanceLevel(String lvl){
         this.importanceLvl = lvl;
     }
+
+    public void addToList()
 
     // Abstract method
     public abstract String done();

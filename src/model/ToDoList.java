@@ -95,7 +95,9 @@ public class ToDoList implements Loadable, Savable {
         String type = selectType(scanner);
         ArrayList<Task> cloned = (ArrayList) toDoList.clone();
         for (Task t : cloned){
-            if (t.getName().equals(search) && t.getType().equals(type)){
+            String tName = t.getName();
+            String tType = t.getType();
+            if (tName.equals(search) && tType.equals(type)){
                 toDoList.remove(t);
             }
 
