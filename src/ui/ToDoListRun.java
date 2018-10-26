@@ -9,28 +9,29 @@ import model.Task;
 import model.ToDoList;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
-public class ToDoListRun {
+public class ToDoListRun{
     private final String FILE = "outputfile.txt";
 
     private model.ToDoList newToDoList = new model.ToDoList();
     private Task task;
     private Scanner scanner = new Scanner(System.in);
     private ArrayList<Task> toDoList = newToDoList.load("outputfile.txt");
-    private ArrayList<EstCompletionTime> times = new ArrayList<>();
+    private List<EstCompletionTime> times = new ArrayList<>();// newToDoList.loadTimes();
 
 
 
-    private ToDoListRun() throws IOException {
+    private ToDoListRun() throws IOException, ClassNotFoundException, NullOutputException{
         String operation;
 
         while (true){
 
             ToDoList newToDoList = new ToDoList();
 
-            System.out.println("\n                  ------Welcome to 'Task Manager'------");
-            System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times\n\n");
+            System.out.println("\n                       ------Welcome to 'Task Manager'------");
+            System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times\n");
             operation = scanner.nextLine();
 
 
@@ -70,7 +71,7 @@ public class ToDoListRun {
             }
 
             if (operation.equals("4")){
-                Collection<Task> tasks= newToDoList.getTasksFromTime(scanner, times);
+                Collection<Task> tasks= newToDoList.getTasksFromTime(scanner, toDoList);
                 for (Task t : tasks){
                     System.out.println(t.getName());
                 }
@@ -83,10 +84,12 @@ public class ToDoListRun {
         }
         try {
             newToDoList.save(toDoList, FILE);
-        } catch (NullOutputException nullOutputException) {
-            nullOutputException.printStackTrace();
-            System.out.println("\nNo FILE exists!");
+           // newToDoList.saveTimes(times);
         }
+//        } catch (NullOutputException nullOutputException) {
+//            nullOutputException.printStackTrace();
+//            System.out.println("\nNo FILE exists!");
+//        }
         finally {
             System.out.println("");
             System.out.println("     -----Have a productive day!-----");
@@ -96,7 +99,7 @@ public class ToDoListRun {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NullOutputException, ClassNotFoundException {
     new ToDoListRun();
 
 }

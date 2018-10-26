@@ -2,17 +2,19 @@ package model;
 
 import exceptions.AlreadyInList;
 import exceptions.NullOutputException;
+import sun.text.normalizer.UTF16;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
-public class ToDoList implements Loadable, Savable {
-
-    private Map<String, ArrayList<Task>> timeMap = new HashMap<>();
+public class ToDoList implements Loadable, Savable, Serializable {
 
 
     @Override
@@ -36,6 +38,24 @@ public class ToDoList implements Loadable, Savable {
         writer.close();
     }
 
+//    public void save(ArrayList<Task> toDoList, String fileName) throws IOException {
+//        FileOutputStream fout= new FileOutputStream (fileName);
+//        ObjectOutputStream oos = new ObjectOutputStream(fout);
+//        oos.writeObject(toDoList);
+//        fout.close();
+//    }
+
+    //REQUIRES: output is "outputfile.txt"
+    // MODIFIES: this
+    // EFFECTS: saves tasks in todoList into the output file
+//    public void saveTimes(List<EstCompletionTime> times) throws IOException {
+//        FileOutputStream fos = new FileOutputStream("t.tmp");
+//        ObjectOutputStream oos = new ObjectOutputStream(fos);
+//        oos.writeObject(times);
+//        oos.close();
+//
+//    }
+
     @Override
     //MODIFIES: this
     // EFFECTS: returns list of tasks from the output file
@@ -58,10 +78,28 @@ public class ToDoList implements Loadable, Savable {
         return loadedList;
 
     }
+
+//    //MODIFIES: this
+//    // EFFECTS: returns list of tasks from the output file
+//    public List<EstCompletionTime> loadTimes() throws IOException, ClassNotFoundException {
+//        FileInputStream fis = new FileInputStream("timeOutputfile.ser");
+//        ObjectInputStream ois = new ObjectInputStream(fis);
+//        List<EstCompletionTime> times = (List<EstCompletionTime>) ois.readObject();
+//        ois.close();
+//        return times;
+//
+//    }
+//    public ArrayList<Task> load(String output) throws IOException, ClassNotFoundException {
+//        FileInputStream fis = new FileInputStream(output);
+//        ObjectInputStream ois = new ObjectInputStream(fis);
+//        ArrayList<Task> times = (ArrayList<Task>) ois.readObject();
+//        ois.close();
+//        return times;
+//    }
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
-    public void addTask(Scanner scanner, ArrayList<Task> toDoList, ArrayList<EstCompletionTime> timeList) throws AlreadyInList {
+    public void addTask(Scanner scanner, ArrayList<Task> toDoList, List<EstCompletionTime> timeList) throws AlreadyInList {
         Task task = null;
         System.out.println("Please enter the task to do");
         String newTask = scanner.nextLine();
@@ -76,24 +114,21 @@ public class ToDoList implements Loadable, Savable {
         task = new SchoolTask(newTask, getNewLevel(newTask, scanner), getSubject(scanner));}
         {}
 
-
-        System.out.println("What is its estimated time to be completed (hours)"+"00:00");
-        int hours = scanner.nextInt();
-        System.out.println("What is its estimated time to be completed (minutes)"+hours+":00");
-        int minutes = scanner.nextInt();
+        String day = dayScanner(scanner);
         scanner.nextLine();
         while (true) {
             for (EstCompletionTime t : timeList) {
-                if (t.getTime().equals(hours + ":" + minutes)) {
+                if (t.getDay().equals(day)) {
                     t.addTask(task);
                     task.addTime(t);
                     break;
                 }
             }
 
-            EstCompletionTime time = new EstCompletionTime(hours, minutes);
+            EstCompletionTime time = new EstCompletionTime(day);
+            time.addTask(task);
             task.addTime(time);
-            timeList.add(time);
+
             break;
         }
 
@@ -103,28 +138,38 @@ public class ToDoList implements Loadable, Savable {
             throw new AlreadyInList();
         }
         toDoList.add(task);
-       // task.addList(this);
 
 
 
     }
+//
+//    public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<EstCompletionTime> times){
+//        System.out.println("What time would you like to check?");
+//        HashSet<Task> tasks= new HashSet<>();
+//        String time = dayScanner(scanner);
+//        for (EstCompletionTime t : times){
+//            if (t.getDay().equals(time)){
+//                tasks.addAll(t.getTasks());
+//
+//            }
+//        }
+//        return tasks;
+//
+//    }
 
-    public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<EstCompletionTime> times){
-        System.out.println("What time would you like to check?");
-        HashSet<Task> tasks= new HashSet<>();
-
-        String time = scanner.nextLine();
-
-        for (EstCompletionTime t : times){
-            if (t.getTime().equals(time)){
-                tasks.addAll(t.getTasks());
+    public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<Task> tasks){
+        HashSet<Task> tasks1= new HashSet<>();
+        String time = dayScanner(scanner);
+        scanner.nextLine();
+        for (Task t : tasks){
+            if (t.getTime().getDay().equals(time)){
+                tasks1.addAll(t.getTime().getTasks());
 
             }
         }
-        return tasks;
+        return tasks1;
 
     }
-
 
 
 
@@ -191,7 +236,7 @@ public class ToDoList implements Loadable, Savable {
         if (typeList == 1){
             System.out.println("All tasks left to complete:");
             for (Task t : sortedList) {
-                System.out.println(t.getName()+" : "+t.getImportanceLvl());//+ " "+t.getTime());
+                System.out.println(t.getName()+" : "+t.getImportanceLvl());//+ " "+t.getDay());
             }
         }
          if (typeList == 2){
@@ -285,6 +330,36 @@ public class ToDoList implements Loadable, Savable {
         System.out.println("What is the subject associated with the School Task?");
         String subject = scanner.nextLine();
         return subject;
+    }
+
+    private String dayScanner(Scanner scanner){
+        System.out.println("What is the task's estimated completion dayScanner?");
+        System.out.println("[1]: SUN, [2]: MON, [3]: TUES, [4]: WED, [5]: THURS, [6]: FRI, [7]: SAT");
+        String day = "";
+        int scan = scanner.nextInt();
+        if (scan == 1){
+            day = "SUNDAY";
+        }
+        if (scan == 2){
+            day = "MONDAY";
+        }
+        if (scan == 3){
+            day = "TUESDAY";
+        }
+        if (scan == 4){
+            day = "WEDNESDAY";
+        }
+        if (scan == 5){
+            day = "THURSDAY";
+        }
+        if (scan == 6){
+            day = "FRIDAY";
+        }
+        if (scan == 7){
+            day = "SATURDAY";
+        }
+
+        return day;
     }
 
 

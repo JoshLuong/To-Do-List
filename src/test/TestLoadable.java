@@ -10,21 +10,21 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLoadable {
-    @Test
-    public void testLoad1() throws IOException {
-        Loadable load = new ToDoList();
-        assertTrue(load.load("loadTestOutputfile.txt").size()== 2);
-        List<String> line = Files.readAllLines(Paths.get("loadTestOutputfile.txt"));
-        assertTrue(line.get(0).equals("shop urgent Regular"));
-        assertTrue(line.get(1).equals("homework low School"));
-        testLoad(load);
-    }
-
-    public void testLoad(Loadable load) throws IOException {
-        Loadable toDoList = new ToDoList();
-        toDoList.load("loadTestOutputfile.txt");
-
-    }
+//    @Test
+//    public void testLoad1() throws IOException {
+//        Loadable load = new ToDoList();
+//        assertTrue(load.load("loadTestOutputfile.txt").size()== 2);
+//        List<String> line = Files.readAllLines(Paths.get("loadTestOutputfile.txt"));
+//        assertTrue(line.get(0).equals("shop urgent Regular"));
+//        assertTrue(line.get(1).equals("homework low School"));
+//        testLoad(load);
+//    }
+//
+//    public void testLoad(Loadable load) throws IOException {
+//        Loadable toDoList = new ToDoList();
+//        toDoList.load("loadTestOutputfile.txt");
+//
+//    }
 
 
 

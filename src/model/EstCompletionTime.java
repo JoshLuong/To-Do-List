@@ -1,31 +1,21 @@
 package model;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class EstCompletionTime {
-    private int hours;
-    private int minutes;
-    private String time;
+public class EstCompletionTime implements Serializable{
+    private String day;
     private ArrayList<Task> tasks = new ArrayList<>();
 
 
-    public EstCompletionTime(int hours, int minutes ){
-        this.hours = hours;
-        this.minutes = minutes;
-        time = Integer.toString(hours)+":"+Integer.toString(minutes);
+    public EstCompletionTime(String day){
+        this.day = day;
 
     }
 
     public boolean hasTask(Task task){
         return this.tasks.contains(task);
     }
-
-//    public void addTask(Task task){
-//        if(!tasks.contains(task)) {
-//            tasks.add(task);
-//            task.addTime(this);
-//        }
-//    }
 
     public void addTask(Task task){
         if (!this.equals(task.getTime())){
@@ -39,16 +29,16 @@ public class EstCompletionTime {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EstCompletionTime that = (EstCompletionTime) o;
-        return Objects.equals(time, that.time);
+        return Objects.equals(day, that.day);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(time);
+        return Objects.hash(day);
     }
 
-    public String getTime(){return time;}
+    public String getDay(){return day;}
 
     public ArrayList<Task> getTasks() { return tasks; }
 }

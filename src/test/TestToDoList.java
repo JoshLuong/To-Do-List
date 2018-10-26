@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-
+//  just save TASK as object, then load the TIMES from TASK into the times list
 public class TestToDoList {
 
 
