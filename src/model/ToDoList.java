@@ -7,13 +7,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class ToDoList implements Loadable, Savable {
+
+    private Map<String, ArrayList<Task>> timeMap = new HashMap<>();
 
 
     @Override
@@ -62,8 +61,8 @@ public class ToDoList implements Loadable, Savable {
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
-    public Task newToDo(Scanner scanner, ArrayList<Task> toDoList) throws AlreadyInList {
-        Task task = new RegularTask("","");
+    public void addTask(Scanner scanner, ArrayList<Task> toDoList, ArrayList<EstCompletionTime> timeList) throws AlreadyInList {
+        Task task = null;
         System.out.println("Please enter the task to do");
         String newTask = scanner.nextLine();
         String type= "";
@@ -77,11 +76,53 @@ public class ToDoList implements Loadable, Savable {
         task = new SchoolTask(newTask, getNewLevel(newTask, scanner), getSubject(scanner));}
         {}
 
+
+        System.out.println("What is its estimated time to be completed (hours)"+"00:00");
+        int hours = scanner.nextInt();
+        System.out.println("What is its estimated time to be completed (minutes)"+hours+":00");
+        int minutes = scanner.nextInt();
+        scanner.nextLine();
+        while (true) {
+            for (EstCompletionTime t : timeList) {
+                if (t.getTime().equals(hours + ":" + minutes)) {
+                    t.addTask(task);
+                    task.addTime(t);
+                    break;
+                }
+            }
+
+            EstCompletionTime time = new EstCompletionTime(hours, minutes);
+            task.addTime(time);
+            timeList.add(time);
+            break;
+        }
+
+
+
         if (isSameInList(task, toDoList)){
             throw new AlreadyInList();
         }
+        toDoList.add(task);
+       // task.addList(this);
 
-        return task;
+
+
+    }
+
+    public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<EstCompletionTime> times){
+        System.out.println("What time would you like to check?");
+        HashSet<Task> tasks= new HashSet<>();
+
+        String time = scanner.nextLine();
+
+        for (EstCompletionTime t : times){
+            if (t.getTime().equals(time)){
+                tasks.addAll(t.getTasks());
+
+            }
+        }
+        return tasks;
+
     }
 
 
@@ -150,7 +191,7 @@ public class ToDoList implements Loadable, Savable {
         if (typeList == 1){
             System.out.println("All tasks left to complete:");
             for (Task t : sortedList) {
-                System.out.println(t.getName()+" : "+t.getImportanceLvl());
+                System.out.println(t.getName()+" : "+t.getImportanceLvl());//+ " "+t.getTime());
             }
         }
          if (typeList == 2){
