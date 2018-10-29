@@ -1,2 +1,3 @@
-shop urgent Regular
-homework low School
+shop urgent Chores SUN
+homework low School MON
+morehomework high School SUN

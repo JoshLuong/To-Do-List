@@ -8,7 +8,7 @@ public class TestSchoolTask extends TestTask {
 
     @BeforeEach
     public void setup(){
-        t = new SchoolTask(name, importanceLvl, subject);
+        t = new SchoolTask(name, importanceLvl);
     }
 
 

@@ -3,9 +3,8 @@ package model;
 public class SchoolTask extends Task {
     String subject;
 
-    public SchoolTask (String name, String importanceLvl, String subject){
+    public SchoolTask (String name, String importanceLvl){
         super(name ,importanceLvl, "School");
-        this.subject = subject;
 
     }
 
@@ -17,10 +16,6 @@ public class SchoolTask extends Task {
 
     }
 
-    @Override
-    public String getSubject() {
-        return subject;
-    }
 
 
 

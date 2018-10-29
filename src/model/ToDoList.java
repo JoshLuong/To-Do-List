@@ -1,17 +1,13 @@
 package model;
 
 import exceptions.AlreadyInList;
+import exceptions.EmptyTaskException;
+import exceptions.NoTaskFoundException;
 import exceptions.NullOutputException;
-import sun.text.normalizer.UTF16;
-
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class ToDoList implements Loadable, Savable, Serializable {
@@ -29,7 +25,7 @@ public class ToDoList implements Loadable, Savable, Serializable {
         PrintWriter writer = new PrintWriter(output, "UTF-8");
         for (Task t : toDoList) {
             List<String> lines = Files.readAllLines(Paths.get(output));
-            lines.add(t.getName() + " " + t.getImportanceLvl()+" " +t.getType());
+            lines.add(t.getName() + " " + t.getImportanceLvl()+" " +t.getType()+ " "+t.getTime().getDay());
 
             for (String line : lines) {
                 writer.println(line);
@@ -38,124 +34,100 @@ public class ToDoList implements Loadable, Savable, Serializable {
         writer.close();
     }
 
-//    public void save(ArrayList<Task> toDoList, String fileName) throws IOException {
-//        FileOutputStream fout= new FileOutputStream (fileName);
-//        ObjectOutputStream oos = new ObjectOutputStream(fout);
-//        oos.writeObject(toDoList);
-//        fout.close();
-//    }
+    public void saveMap(Map<String, List<String>> map, String file) throws IOException {
+        PrintWriter writer = new PrintWriter("mapoutput.txt", "UTF-8");
+        for (Map.Entry<String, List<String>> entry : map.entrySet())
+        {
+            List<String> lines = Files.readAllLines(Paths.get("mapoutput.txt"));
+            List<String> tasks = entry.getValue();
+            StringBuilder sb = new StringBuilder();
+            for (String s : tasks)
+            {
+                sb.append(s);
+                sb.append(" ");
+            }
+            lines.add(entry.getKey()+" "+ sb);
 
-    //REQUIRES: output is "outputfile.txt"
-    // MODIFIES: this
-    // EFFECTS: saves tasks in todoList into the output file
-//    public void saveTimes(List<EstCompletionTime> times) throws IOException {
-//        FileOutputStream fos = new FileOutputStream("t.tmp");
-//        ObjectOutputStream oos = new ObjectOutputStream(fos);
-//        oos.writeObject(times);
-//        oos.close();
-//
-//    }
+            for (String line : lines) {
+                writer.println(line);
+            }
+        }
+        writer.close();
+
+    }
+
+    public Map<String, List<String>> loadMap() throws IOException, ClassNotFoundException {
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> lines = Files.readAllLines(Paths.get("mapoutput.txt"));
+        for (String s: lines){
+            ArrayList<String> partsOfLine = splitOnSpace(s);
+            List<String> tasks = new ArrayList<>();
+
+            for (String t : partsOfLine.subList(1, partsOfLine.size())){
+                tasks.add(t);
+            }
+
+            map.put(partsOfLine.get(0), tasks);
+        }
+        return map;
+
+    }
 
     @Override
     //MODIFIES: this
     // EFFECTS: returns list of tasks from the output file
-    public ArrayList<Task> load(String output) throws IOException {
+    public ArrayList<Task> load(String output, List<EstCompletionTime> timeList) throws IOException {
         Task t = new RegularTask("","");
+        EstCompletionTime time = new EstCompletionTime("");
         List<String> lines = Files.readAllLines(Paths.get(output));
         ArrayList<Task> loadedList = new ArrayList<>();
         for (String s: lines){
             ArrayList<String> partsOfLine = splitOnSpace(s);
             if (partsOfLine.get(2).equals("Regular")){
+                time = new EstCompletionTime(partsOfLine.get(3));
                 t = new RegularTask(partsOfLine.get(0), partsOfLine.get(1));
             }
             {}
             if (partsOfLine.get(2).equals("School")) {
-                t = new SchoolTask(partsOfLine.get(0), partsOfLine.get(1),partsOfLine.get(2));
+                time = new EstCompletionTime(partsOfLine.get(3));
+                t = new SchoolTask(partsOfLine.get(0), partsOfLine.get(1));
             }
+            String day = time.getDay();
+            addTimeAndTask(timeList, t, day);
             loadedList.add(t);
-
         }
         return loadedList;
 
     }
-
-//    //MODIFIES: this
-//    // EFFECTS: returns list of tasks from the output file
-//    public List<EstCompletionTime> loadTimes() throws IOException, ClassNotFoundException {
-//        FileInputStream fis = new FileInputStream("timeOutputfile.ser");
-//        ObjectInputStream ois = new ObjectInputStream(fis);
-//        List<EstCompletionTime> times = (List<EstCompletionTime>) ois.readObject();
-//        ois.close();
-//        return times;
-//
-//    }
-//    public ArrayList<Task> load(String output) throws IOException, ClassNotFoundException {
-//        FileInputStream fis = new FileInputStream(output);
-//        ObjectInputStream ois = new ObjectInputStream(fis);
-//        ArrayList<Task> times = (ArrayList<Task>) ois.readObject();
-//        ois.close();
-//        return times;
-//    }
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
-    public void addTask(Scanner scanner, ArrayList<Task> toDoList, List<EstCompletionTime> timeList) throws AlreadyInList {
+    public void addTask(Scanner scanner, ArrayList<Task> toDoList, List<EstCompletionTime> timeList) throws AlreadyInList, EmptyTaskException {
         Task task = null;
         System.out.println("Please enter the task to do");
         String newTask = scanner.nextLine();
-        String type= "";
-        if (!newTask.equals("")) {
-            type = selectType(scanner);
+        if(newTask.equals("")| newTask.equals(" ")){
+            throw new EmptyTaskException();
         }
+        String type= selectType(scanner);
+
         if (type.equals("Regular")){
             task = new RegularTask(newTask, getNewLevel(newTask, scanner));
         }
         if (type.equals("School")){
-        task = new SchoolTask(newTask, getNewLevel(newTask, scanner), getSubject(scanner));}
+        task = new SchoolTask(newTask, getNewLevel(newTask, scanner));}
         {}
 
         String day = dayScanner(scanner);
         scanner.nextLine();
-        while (true) {
-            for (EstCompletionTime t : timeList) {
-                if (t.getDay().equals(day)) {
-                    t.addTask(task);
-                    task.addTime(t);
-                    break;
-                }
-            }
-
-            EstCompletionTime time = new EstCompletionTime(day);
-            time.addTask(task);
-            task.addTime(time);
-
-            break;
-        }
-
-
+        addTimeAndTask(timeList, task, day);
 
         if (isSameInList(task, toDoList)){
             throw new AlreadyInList();
         }
         toDoList.add(task);
-
-
-
     }
-//
-//    public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<EstCompletionTime> times){
-//        System.out.println("What time would you like to check?");
-//        HashSet<Task> tasks= new HashSet<>();
-//        String time = dayScanner(scanner);
-//        for (EstCompletionTime t : times){
-//            if (t.getDay().equals(time)){
-//                tasks.addAll(t.getTasks());
-//
-//            }
-//        }
-//        return tasks;
-//
-//    }
+
 
     public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<Task> tasks){
         HashSet<Task> tasks1= new HashSet<>();
@@ -171,11 +143,10 @@ public class ToDoList implements Loadable, Savable, Serializable {
 
     }
 
-
-
     // MODIFIES: this
     // EFFECTS: takes out completed task from toDoList, unless not there
-    public void crossOff(Scanner scanner, ArrayList<Task> toDoList){
+    public void crossOff(Scanner scanner, ArrayList<Task> toDoList, Map<String, List<String>> searchImptLvl) throws NoTaskFoundException {
+        Boolean b = false;
         System.out.println("Please enter the task completed");
         String search = scanner.nextLine();
         String type = selectType(scanner);
@@ -185,8 +156,15 @@ public class ToDoList implements Loadable, Savable, Serializable {
             String tType = t.getType();
             if (tName.equals(search) && tType.equals(type)){
                 toDoList.remove(t);
+                List<String > tasks = searchImptLvl.get(t.getImportanceLvl());
+                tasks.remove(t.getName());
+                b = true;
             }
 
+        }
+
+        if (b.equals(false)){
+            throw new NoTaskFoundException();
         }
 
     }
@@ -199,7 +177,7 @@ public class ToDoList implements Loadable, Savable, Serializable {
         else System.out.println("Tasks to complete based on level of importance:");
         ArrayList<Task> sortedList = sortedList(toDoList);
         for (Task t : sortedList){
-            System.out.println(t.getName()+" : "+t.getImportanceLvl());
+            System.out.println(t.getImportanceLvl()+". . ." +t.getName());
         }
     }
 
@@ -229,21 +207,21 @@ public class ToDoList implements Loadable, Savable, Serializable {
     public void printList(Scanner scanner, ArrayList<Task> sortedList){
         boolean done = false;
         Task rt = new RegularTask("","");
-        Task st = new SchoolTask("","","");
+        Task st = new SchoolTask("","");
         System.out.println("Which list of tasks do you want to see: [1] All Tasks, [2] Regular Tasks, [3] School Tasks");
          int typeList = scanner.nextInt();
          scanner.nextLine();
         if (typeList == 1){
             System.out.println("All tasks left to complete:");
             for (Task t : sortedList) {
-                System.out.println(t.getName()+" : "+t.getImportanceLvl());//+ " "+t.getDay());
+                System.out.println(t.getImportanceLvl()+". . ." +t.getName());
             }
         }
          if (typeList == 2){
              System.out.println("Regular tasks left to complete:");
              for (Task t : sortedList){
                  if (t.getType().equals("Regular")){
-                      System.out.println(t.getName()+" : "+t.getImportanceLvl());
+                      System.out.println(t.getImportanceLvl()+". . ." +t.getName());
                       done = true;
                      }
                  }
@@ -255,14 +233,13 @@ public class ToDoList implements Loadable, Savable, Serializable {
             System.out.println("School tasks left to complete:");
             for (Task t : sortedList){
                 if (t.getType().equals("School")){
-                    System.out.println(t.getSubject()+" "+t.getName()+" : "+t.getImportanceLvl());
+                    System.out.println(t.getImportanceLvl()+". . ." +t.getName());
                     done = true;
                 }
             }
             if (!done){
                 System.out.println(st.done());
             }
-
         }
         {}
 
@@ -320,17 +297,10 @@ public class ToDoList implements Loadable, Savable, Serializable {
         if (level == 2) {
             type = "School";
         }
-        {}
-
         scanner.nextLine();
         return type;
     }
 
-    private String getSubject(Scanner scanner){
-        System.out.println("What is the subject associated with the School Task?");
-        String subject = scanner.nextLine();
-        return subject;
-    }
 
     private String dayScanner(Scanner scanner){
         System.out.println("What is the task's estimated completion dayScanner?");
@@ -360,6 +330,42 @@ public class ToDoList implements Loadable, Savable, Serializable {
         }
 
         return day;
+    }
+
+    private void addTimeAndTask(List<EstCompletionTime> timeList, Task task, String day){
+        while (true) {
+            for (EstCompletionTime t : timeList) {
+                if (t.getDay().equals(day)) {
+                    t.addTask(task);
+                    task.addTime(t);
+                    break;
+                }
+            }
+            EstCompletionTime time = new EstCompletionTime(day);
+            time.addTask(task);
+            task.addTime(time);
+
+            break;
+        }
+
+    }
+
+    public String printUrgency(Scanner scanner){
+        System.out.println("What is the urgency you would like to look up? [1] urgent, [2] medium, [3] low");
+        String s = "";
+        int n = scanner.nextInt();
+        if (n == 1){
+            s = "urgent";
+        }
+        if (n == 2){
+            s = "medium";
+        }
+        if (n == 3){
+            s = "low";
+        }
+        scanner.nextLine();
+        return s;
+
     }
 
 

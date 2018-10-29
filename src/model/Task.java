@@ -15,6 +15,7 @@ public abstract class Task implements Serializable {
         this.importanceLvl = importanceLvl;
         this.type = type;
         time = new EstCompletionTime("");
+        time.addTask(this);
     }
 
     // EFFECTS: return the RegularTask's importance level
@@ -53,5 +54,4 @@ public abstract class Task implements Serializable {
     // Abstract method
     public abstract String done();
 
-    public abstract String getSubject();
 }

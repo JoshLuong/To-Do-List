@@ -10,7 +10,6 @@ public class EstCompletionTime implements Serializable{
 
     public EstCompletionTime(String day){
         this.day = day;
-
     }
 
     public boolean hasTask(Task task){

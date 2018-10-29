@@ -48,7 +48,7 @@ public class TestToDoList {
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
         Task task1 = new RegularTask("shop", "low");
-        Task task2 = new SchoolTask("homework", "urgent", "biology");
+        Task task2 = new SchoolTask("homework", "urgent");
         tasks.add(task1);
         tasks.add(task2);
         ArrayList<Task> newList = toDoList.sortedList(tasks);
@@ -64,10 +64,10 @@ public class TestToDoList {
         ToDoList toDoList = new ToDoList();
         ArrayList<Task> tasks = new ArrayList<>();
         Task task1 = new RegularTask("shop", "low");
-        Task task2 = new SchoolTask("math", "urgent","School");
-        Task task3 = new SchoolTask("biology", "medium","School");
-        Task task4 = new SchoolTask("chemistry", "low", "School");
-        Task task5 = new SchoolTask("essay", "urgent","School");
+        Task task2 = new SchoolTask("math", "urgent");
+        Task task3 = new SchoolTask("biology", "medium");
+        Task task4 = new SchoolTask("chemistry", "low");
+        Task task5 = new SchoolTask("essay", "urgent");
         tasks.add(task1);
         tasks.add(task2);
         tasks.add(task3);

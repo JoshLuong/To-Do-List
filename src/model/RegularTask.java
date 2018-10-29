@@ -16,8 +16,5 @@ public class RegularTask extends Task {
         return "\nYou've completed all of your regular tasks!";
     }
 
-    @Override
-    public String getSubject() {
-        return "\nThis isn't a School Task!";
-    }
+
 }
