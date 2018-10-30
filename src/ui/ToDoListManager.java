@@ -1,16 +1,18 @@
-package model;
+package ui;
 
 import exceptions.AlreadyInList;
 import exceptions.EmptyTaskException;
 import exceptions.NoTaskFoundException;
 import exceptions.NullOutputException;
+import model.*;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
 
-public class ToDoList implements Loadable, Savable, Serializable {
+public class ToDoListManager implements Loadable, Savable, Serializable {
 
 
     @Override
@@ -26,6 +28,24 @@ public class ToDoList implements Loadable, Savable, Serializable {
         for (Task t : toDoList) {
             List<String> lines = Files.readAllLines(Paths.get(output));
             lines.add(t.getName() + " " + t.getImportanceLvl()+" " +t.getType()+ " "+t.getTime().getDay());
+
+            for (String line : lines) {
+                writer.println(line);
+            }
+        }
+        writer.close();
+    }
+    public void save1(Map<String, Task> mapToDoList, String output) throws IOException, NullOutputException {
+
+        if (!output.equals("outputfile.txt") &&	 !(output.equals("saveTestOutputfile.txt"))){
+            throw new NullOutputException();
+        }
+        PrintWriter writer = new PrintWriter(output, "UTF-8");
+        for (Map.Entry<String, Task> entry : mapToDoList.entrySet())
+        {
+            List<String> lines = Files.readAllLines(Paths.get(output));
+            Task t = entry.getValue();
+            lines.add(entry.getKey()+" "+ t.getName() + " " + t.getImportanceLvl()+" " +t.getType()+ " "+t.getTime().getDay());
 
             for (String line : lines) {
                 writer.println(line);
@@ -56,7 +76,7 @@ public class ToDoList implements Loadable, Savable, Serializable {
 
     }
 
-    public Map<String, List<String>> loadMap() throws IOException, ClassNotFoundException {
+    public Map<String, List<String>> loadMap() throws IOException {
         Map<String, List<String>> map = new HashMap<>();
         List<String> lines = Files.readAllLines(Paths.get("mapoutput.txt"));
         for (String s: lines){
@@ -99,17 +119,42 @@ public class ToDoList implements Loadable, Savable, Serializable {
         return loadedList;
 
     }
+    //MODIFIES: this
+    // EFFECTS: returns list of tasks from the output file
+    public Map<String, Task> load1(String output, List<EstCompletionTime> timeList) throws IOException {
+        Task t = new RegularTask("","");
+        EstCompletionTime time = new EstCompletionTime("");
+        List<String> lines = Files.readAllLines(Paths.get(output));
+        Map<String, Task> loadedList = new HashMap<>();
+        for (String s: lines){
+            ArrayList<String> partsOfLine = splitOnSpace(s);
+            if (partsOfLine.get(3).equals("Regular")){
+                time = new EstCompletionTime(partsOfLine.get(4));
+                t = new RegularTask(partsOfLine.get(1), partsOfLine.get(2));
+            }
+            {}
+            if (partsOfLine.get(3).equals("School")) {
+                time = new EstCompletionTime(partsOfLine.get(4));
+                t = new SchoolTask(partsOfLine.get(1), partsOfLine.get(2));
+            }
+            String day = time.getDay();
+            addTimeAndTask(timeList, t, day);
+            loadedList.put(partsOfLine.get(0), t);
+        }
+        return loadedList;
+
+    }
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
-    public void addTask(Scanner scanner, ArrayList<Task> toDoList, List<EstCompletionTime> timeList) throws AlreadyInList, EmptyTaskException {
+    public Task addTask(Scanner scanner, Map<String, Task> toDoList, List<EstCompletionTime> timeList) throws AlreadyInList, EmptyTaskException {
         Task task = null;
         System.out.println("Please enter the task to do");
         String newTask = scanner.nextLine();
         if(newTask.equals("")| newTask.equals(" ")){
             throw new EmptyTaskException();
         }
-        String type= selectType(scanner);
+        String type = selectType(scanner);
 
         if (type.equals("Regular")){
             task = new RegularTask(newTask, getNewLevel(newTask, scanner));
@@ -125,52 +170,61 @@ public class ToDoList implements Loadable, Savable, Serializable {
         if (isSameInList(task, toDoList)){
             throw new AlreadyInList();
         }
-        toDoList.add(task);
+        toDoList.put(task.getName(), task);
+        return task;
     }
 
 
-    public Collection<Task> getTasksFromTime(Scanner scanner, ArrayList<Task> tasks){
+    public Collection<Task> getTasksFromTime(Scanner scanner, Map<String, Task> tasks){
         HashSet<Task> tasks1= new HashSet<>();
+        Collection<Task> List = tasks.values();
         String time = dayScanner(scanner);
         scanner.nextLine();
-        for (Task t : tasks){
+        for (Task t : List){
             if (t.getTime().getDay().equals(time)){
                 tasks1.addAll(t.getTime().getTasks());
-
             }
         }
+
         return tasks1;
 
     }
 
     // MODIFIES: this
     // EFFECTS: takes out completed task from toDoList, unless not there
-    public void crossOff(Scanner scanner, ArrayList<Task> toDoList, Map<String, List<String>> searchImptLvl) throws NoTaskFoundException {
-        Boolean b = false;
+    public void crossOff(Scanner scanner, Map<String, Task> toDoList, Map<String, List<String>> searchImptLvl) throws NoTaskFoundException {
+       // Boolean b = false;
         System.out.println("Please enter the task completed");
         String search = scanner.nextLine();
-        String type = selectType(scanner);
-        ArrayList<Task> cloned = (ArrayList) toDoList.clone();
-        for (Task t : cloned){
-            String tName = t.getName();
-            String tType = t.getType();
-            if (tName.equals(search) && tType.equals(type)){
-                toDoList.remove(t);
-                List<String > tasks = searchImptLvl.get(t.getImportanceLvl());
-                tasks.remove(t.getName());
-                b = true;
-            }
+        //String type = selectType(scanner);
+//        ArrayList<Task> cloned = (ArrayList) toDoList.clone();
+//        for (Task t : cloned){
+//            String tName = t.getName();
+//            String tType = t.getType();
+//            if (tName.equals(search) && tType.equals(type)){
+//                toDoList.remove(t);
+//                List<String > tasks = searchImptLvl.get(t.getImportanceLvl());
+//                tasks.remove(t.getName());
+//                b = true;
+//            }
+//
+//        }
+//
+//        if (b.equals(false)){
+//            throw new NoTaskFoundException();
+//        }
+        if (toDoList.containsKey(search)){
+            List<String> tasks = searchImptLvl.get(toDoList.get(search).getImportanceLvl());
+            tasks.remove(toDoList.get(search).getName());
+            toDoList.remove(search);
 
         }
-
-        if (b.equals(false)){
-            throw new NoTaskFoundException();
-        }
+        else throw new NoTaskFoundException();
 
     }
     // MODIFIES: this
     // EFFECTS: prints out toDoList
-    public void printStatement(ArrayList<Task> toDoList){
+    public void printStatement(Map<String, Task> toDoList){
         if (toDoList.size() == 0){
             System.out.println("Good job, you've finished all the tasks!");
         }
@@ -183,19 +237,20 @@ public class ToDoList implements Loadable, Savable, Serializable {
 
     // MODIFIES: this
     // EFFECTS: sorts the list based on level of importance
-    public ArrayList<Task> sortedList(ArrayList<Task> oldList){
+    public ArrayList<Task> sortedList(Map<String, Task> oldList){
+        Collection<Task> List = oldList.values();
         ArrayList<Task> newList = new ArrayList<>();
-        for (Task t : oldList){
+        for (Task t : List){
             if (t.getImportanceLvl().equals("urgent")){
                 newList.add(t);
             }
         }
-        for (Task t : oldList){
+        for (Task t : List){
             if (t.getImportanceLvl().equals("medium")){
                 newList.add(t);
             }
         }
-        for (Task t : oldList){
+        for (Task t : List){
             if (t.getImportanceLvl().equals("low")){
                 newList.add(t);
             }
@@ -276,19 +331,20 @@ public class ToDoList implements Loadable, Savable, Serializable {
 
     }
 
-    private boolean isSameInList(Task task, ArrayList<Task> toDoList){
-        for (Task str : toDoList){
-            if (task.getName().equals(str.getName())  && task.getType().equals(str.getType())){
-                return true;
-            }
-
-        }
-        return false;
+    private boolean isSameInList(Task task, Map<String, Task> toDoList){
+//        for (Task str : toDoList){
+//            if (task.getName().equals(str.getName())  && task.getType().equals(str.getType())){
+//                return true;
+//            }
+//
+//        }
+//        return false;
+        return toDoList.containsKey(task.getName());
 
     }
 
-    private String selectType(Scanner scanner){
-        String type="";
+    private String selectType(Scanner scanner) {
+        String type= "";
         System.out.println("Please enter the Task's type: [1] Regular Task, [2] School Task");
         int level = scanner.nextInt();
         if (level == 1) {
@@ -344,7 +400,7 @@ public class ToDoList implements Loadable, Savable, Serializable {
             EstCompletionTime time = new EstCompletionTime(day);
             time.addTask(task);
             task.addTime(time);
-
+            timeList.add(time);
             break;
         }
 
@@ -366,6 +422,15 @@ public class ToDoList implements Loadable, Savable, Serializable {
         scanner.nextLine();
         return s;
 
+    }
+
+    public void addToMap(Map<String, List<String>> searchImptLvl,Task t){
+        if (!searchImptLvl.containsKey(t.getImportanceLvl())){
+            List<String> tasks = new ArrayList<>();
+            tasks.add(t.getName());
+            searchImptLvl.put(t.getImportanceLvl(), tasks);
+        }
+        else searchImptLvl.get(t.getImportanceLvl()).add(t.getName());
     }
 
 

@@ -3,6 +3,7 @@ package test;
 import exceptions.NullOutputException;
 import model.*;
 import org.junit.jupiter.api.Test;
+import ui.ToDoListManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +20,7 @@ public class TestSavable {
         ArrayList<Task> tasks = new ArrayList<>();
         RegularTask task = new RegularTask("eat","urgent");
         tasks.add(task);
-        Savable save = new ToDoList();
+        Savable save = new ToDoListManager();
         try {
             save.save(tasks, "saveTestOutputfile.txt");
         } catch (NullOutputException e) {
@@ -35,7 +36,7 @@ public class TestSavable {
         ArrayList<Task> tasks = new ArrayList<>();
         RegularTask task = new RegularTask("eat","urgent");
         tasks.add(task);
-        Savable save = new ToDoList();
+        Savable save = new ToDoListManager();
         try{
         save.save(tasks, "null.txt");
         fail("Shouldn't catch");

@@ -8,20 +8,18 @@ import exceptions.NoTaskFoundException;
 import exceptions.NullOutputException;
 import model.EstCompletionTime;
 import model.Task;
-import model.ToDoList;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 
 public class ToDoListRun{
     private final String FILE = "outputfile.txt";
 
-    private model.ToDoList newToDoList = new model.ToDoList();
+    private ToDoListManager newToDoListManager = new ToDoListManager();
     private Scanner scanner = new Scanner(System.in);
     private List<EstCompletionTime> times = new ArrayList<>();
-    private ArrayList<Task> toDoList = newToDoList.load("outputfile.txt", times);
-    public Map<String, List<String>> searchImptLvl = newToDoList.loadMap();
+    private Map<String, Task> toDoList = newToDoListManager.load1("outputfile.txt", times);
+    private Map<String, List<String>> searchImptLvl = newToDoListManager.loadMap();
 
 
 
@@ -30,24 +28,19 @@ public class ToDoListRun{
 
         while (true){
 
-            ToDoList newToDoList = new ToDoList();
+            ToDoListManager newToDoListManager = new ToDoListManager();
 
-            System.out.println("\n                                    ------Welcome to 'Task Manager'------");
-            System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times, [5] find a task based on urgency\n");
+            System.out.println("\n\n                                     ------Welcome to 'Task Manager'------");
+            System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times, [5] find a task based on urgency");
+            System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
             operation = scanner.nextLine();
 
 
 
             if (operation.equals("1")) {
                 try {
-                     newToDoList.addTask(scanner, toDoList, times);
-                     Task t = toDoList.get(toDoList.size()-1);
-                     if (!searchImptLvl.containsKey(t.getImportanceLvl())){
-                         List<String> tasks = new ArrayList<>();
-                         tasks.add(t.getName());
-                         searchImptLvl.put(t.getImportanceLvl(), tasks);
-                     }
-                     else searchImptLvl.get(t.getImportanceLvl()).add(t.getName());
+                     Task t = newToDoListManager.addTask(scanner, toDoList, times);
+                     newToDoListManager.addToMap(searchImptLvl, t);
                     System.out.println("you added "+t.getName()+" to the to-do list!");
 
                 } catch (AlreadyInList alreadyInList) {
@@ -55,17 +48,13 @@ public class ToDoListRun{
 
                 } catch (EmptyTaskException emptyTaskException){
                     System.out.println("You cannot add an empty task!");
-
-                }
-                finally {
-                    System.out.println("\nDon't procrastinate!");
                 }
 
             }
 
             if (operation.equals("2")) {
                 try {
-                    newToDoList.crossOff(scanner, toDoList, searchImptLvl);
+                    newToDoListManager.crossOff(scanner, toDoList, searchImptLvl);
                     System.out.println("The task was crossed off the to-do list!");
                 } catch (NoTaskFoundException e) {
                     System.out.println("There was no task found in the list!");
@@ -73,27 +62,28 @@ public class ToDoListRun{
 
             }
             if (operation.equals("3")) {
-
-                ArrayList<Task> sortedList = newToDoList.sortedList(toDoList);
-                newToDoList.printList(scanner, sortedList);
+                ArrayList<Task> sortedList = newToDoListManager.sortedList(toDoList);
+                newToDoListManager.printList(scanner, sortedList);
             }
 
             if (operation.equals("4")){
-                Collection<Task> tasks= newToDoList.getTasksFromTime(scanner, toDoList);
+                Collection<Task> tasks= newToDoListManager.getTasksFromTime(scanner, toDoList);
                 for (Task t : tasks){
                     System.out.println(t.getName());
                 }
             }
-
             if (operation.equals("5")){
-                String s = newToDoList.printUrgency(scanner);
-                if (searchImptLvl.get(s).size() > 0){
+                String s = newToDoListManager.printUrgency(scanner);
+                try {
                     for (int i = 0; i < searchImptLvl.get(s).size(); i++) {
                         System.out.println(searchImptLvl.get(s).get(i));
                     }
                 }
+                catch (NullPointerException n){
+                    System.out.println("There are no existing tasks with the chosen urgency!");}
+                }
 
-            }
+
             else if (operation.equals("quit")) {
                 break;
             }
@@ -101,16 +91,15 @@ public class ToDoListRun{
 
         }
         try {
-            newToDoList.save(toDoList, FILE);
-            newToDoList.saveMap(searchImptLvl, FILE);
+            newToDoListManager.save1(toDoList, FILE);
+            newToDoListManager.saveMap(searchImptLvl, FILE);
         }catch (NullOutputException nullOutputException) {
             nullOutputException.printStackTrace();
             System.out.println("\nNo FILE exists!");
         }
         finally {
-            System.out.println("");
-            System.out.println("     -----Have a productive day!-----");
-            newToDoList.printStatement(toDoList);
+            System.out.println("\n      -----Have a productive day!-----");
+            newToDoListManager.printStatement(toDoList);
         }
 
     }
