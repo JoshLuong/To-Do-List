@@ -23,7 +23,7 @@ public class ToDoListRun{
 
 
 
-    private ToDoListRun() throws IOException, ClassNotFoundException {
+    private ToDoListRun() throws IOException{
         String operation;
 
         while (true){

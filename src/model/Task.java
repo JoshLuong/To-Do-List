@@ -1,8 +1,6 @@
 package model;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
 
 public abstract class Task implements Serializable {

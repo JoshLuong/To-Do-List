@@ -35,6 +35,30 @@ public class ToDoListManager implements Loadable, Savable, Serializable {
         }
         writer.close();
     }
+
+//    public void saveTimes(List<EstCompletionTime> times, String output) throws IOException, NullOutputException {
+//
+//        PrintWriter writer = new PrintWriter("times.txt", "UTF-8");
+//        for (EstCompletionTime t : times) {
+//            List<String> lines = Files.readAllLines(Paths.get("times.txt"));
+//            lines.add(t.getDay() + " " + getTasksFromList(t.getTasks()));
+//
+//            for (String line : lines) {
+//                writer.println(line);
+//            }
+//        }
+//        writer.close();
+//    }
+
+//    private StringBuilder getTasksFromList(ArrayList<Task> tasks){
+//        StringBuilder sb = new StringBuilder();
+//        for (Task t: tasks){
+//            sb.append(t.getName() + " " + t.getImportanceLvl()+" " +t.getType()+ " "+t.getTime().getDay());
+//
+//        }
+//        return sb;
+//    }
+
     public void save1(Map<String, Task> mapToDoList, String output) throws IOException, NullOutputException {
 
         if (!output.equals("outputfile.txt") &&	 !(output.equals("saveTestOutputfile.txt"))){
@@ -92,6 +116,50 @@ public class ToDoListManager implements Loadable, Savable, Serializable {
         return map;
 
     }
+//    public ArrayList<EstCompletionTime> loadTimes() throws IOException {
+//        ArrayList<EstCompletionTime> times = new ArrayList<>();
+//        List<String> lines = Files.readAllLines(Paths.get("times.txt"));
+//        Task t = new RegularTask("","");
+//        EstCompletionTime time = new EstCompletionTime("");
+//        ArrayList<EstCompletionTime> time1 = new ArrayList<>();
+//        for (String s: lines){
+//            ArrayList<String> partsOfLine = splitOnSpace(s);
+//            ArrayList<Task> ts = new ArrayList<>();
+//            for (int i = 1; i < partsOfLine.size(); i+=4){
+//                int type = i+2;
+//                int name = i;
+//                int imptlvl = i+1;
+//                if (partsOfLine.get(type).equals("Regular")){
+//                    time = new EstCompletionTime(partsOfLine.get(0));
+//                    t = new RegularTask(partsOfLine.get(name), partsOfLine.get(imptlvl));
+//                }
+//                {}
+//                if (partsOfLine.get(type).equals("School")) {
+//                    time = new EstCompletionTime(partsOfLine.get(0));
+//                    t = new SchoolTask(partsOfLine.get(name), partsOfLine.get(imptlvl));
+//                }
+//                String day = time.getDay();
+//                addTimeAndTask(time1, t, day);
+////                for (EstCompletionTime et : timeList) {
+////                    if (et.getDay().equals(day)) {
+////                        et.addTask(task);
+////                        task.addTime(t);
+////                        break;
+////                    }
+////                }
+//                times.add(t.getTime());
+//
+//            }
+//
+//            }
+//
+//        return times;
+//
+//
+//
+//        }
+
+
 
     @Override
     //MODIFIES: this
@@ -193,35 +261,18 @@ public class ToDoListManager implements Loadable, Savable, Serializable {
     // MODIFIES: this
     // EFFECTS: takes out completed task from toDoList, unless not there
     public void crossOff(Scanner scanner, Map<String, Task> toDoList, Map<String, List<String>> searchImptLvl) throws NoTaskFoundException {
-       // Boolean b = false;
         System.out.println("Please enter the task completed");
         String search = scanner.nextLine();
-        //String type = selectType(scanner);
-//        ArrayList<Task> cloned = (ArrayList) toDoList.clone();
-//        for (Task t : cloned){
-//            String tName = t.getName();
-//            String tType = t.getType();
-//            if (tName.equals(search) && tType.equals(type)){
-//                toDoList.remove(t);
-//                List<String > tasks = searchImptLvl.get(t.getImportanceLvl());
-//                tasks.remove(t.getName());
-//                b = true;
-//            }
-//
-//        }
-//
-//        if (b.equals(false)){
-//            throw new NoTaskFoundException();
-//        }
         if (toDoList.containsKey(search)){
             List<String> tasks = searchImptLvl.get(toDoList.get(search).getImportanceLvl());
+            toDoList.get(search).getTime().getTasks().remove(toDoList.get(search));
             tasks.remove(toDoList.get(search).getName());
             toDoList.remove(search);
-
         }
         else throw new NoTaskFoundException();
 
     }
+
     // MODIFIES: this
     // EFFECTS: prints out toDoList
     public void printStatement(Map<String, Task> toDoList){
@@ -388,21 +439,26 @@ public class ToDoListManager implements Loadable, Savable, Serializable {
         return day;
     }
 
-    private void addTimeAndTask(List<EstCompletionTime> timeList, Task task, String day){
-        while (true) {
+    private void addTimeAndTask(List<EstCompletionTime> timeList, Task task, String day) {
+        boolean b = true;
+        while (true && b) {
             for (EstCompletionTime t : timeList) {
                 if (t.getDay().equals(day)) {
                     t.addTask(task);
                     task.addTime(t);
-                    break;
+                    b = false;
                 }
             }
+            break;
+        }
+        while (true && b) {
             EstCompletionTime time = new EstCompletionTime(day);
             time.addTask(task);
             task.addTime(time);
             timeList.add(time);
-            break;
+            b = false;
         }
+
 
     }
 
