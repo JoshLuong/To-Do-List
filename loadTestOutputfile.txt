@@ -1,3 +1,2 @@
-shop urgent Chores SUN
-homework low School MON
-morehomework high School SUN
+hi hi low Regular MONDAY
+hhh hhh medium School SUNDAY

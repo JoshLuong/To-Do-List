@@ -7,20 +7,19 @@ import exceptions.EmptyTaskException;
 import exceptions.NoTaskFoundException;
 import exceptions.NullOutputException;
 import model.EstCompletionTime;
+import model.SaveAndLoad;
 import model.Task;
 
 import java.io.IOException;
 import java.util.*;
 
-public class ToDoListRun{
+public class ToDoListRun extends ToDoListManager{
     private final String FILE = "outputfile.txt";
-
-    private ToDoListManager newToDoListManager = new ToDoListManager();
+//    private ToDoListManager newToDoListManager = new ToDoListManager();
     private Scanner scanner = new Scanner(System.in);
-    private List<EstCompletionTime> times = new ArrayList<>();
-    private Map<String, Task> toDoList = newToDoListManager.load1("outputfile.txt", times);
-    private Map<String, List<String>> searchImptLvl = newToDoListManager.loadMap();
-
+//    private List<EstCompletionTime> times = new ArrayList<>();
+    private Map<String, Task> toDoList = load("outputfile.txt", times);
+   // private Map<String, List<String>> searchImptLvl = loadMap();
 
 
     private ToDoListRun() throws IOException{
@@ -28,7 +27,7 @@ public class ToDoListRun{
 
         while (true){
 
-            ToDoListManager newToDoListManager = new ToDoListManager();
+//            ToDoListManager newToDoListManager = new ToDoListManager();
 
             System.out.println("\n\n                                     ------Welcome to 'Task Manager'------");
             System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times, [5] find a task based on urgency");
@@ -39,8 +38,8 @@ public class ToDoListRun{
 
             if (operation.equals("1")) {
                 try {
-                     Task t = newToDoListManager.addTask(scanner, toDoList, times);
-                     newToDoListManager.addToMap(searchImptLvl, t);
+                     Task t = addTask(scanner, toDoList);
+                     addToMap(t);
                     System.out.println("you added "+t.getName()+" to the to-do list!");
 
                 } catch (AlreadyInList alreadyInList) {
@@ -54,7 +53,7 @@ public class ToDoListRun{
 
             if (operation.equals("2")) {
                 try {
-                    newToDoListManager.crossOff(scanner, toDoList, searchImptLvl);
+                    crossOff(scanner, toDoList);
                     System.out.println("The task was crossed off the to-do list!");
                 } catch (NoTaskFoundException e) {
                     System.out.println("There was no task found in the list!");
@@ -62,22 +61,20 @@ public class ToDoListRun{
 
             }
             if (operation.equals("3")) {
-                ArrayList<Task> sortedList = newToDoListManager.sortedList(toDoList);
-                newToDoListManager.printList(scanner, sortedList);
+                ArrayList<Task> sortedList = sortedList(toDoList);
+                printList(scanner, sortedList, toDoList);
             }
 
             if (operation.equals("4")){
-                Collection<Task> tasks= newToDoListManager.getTasksFromTime(scanner, toDoList);
+                Collection<Task> tasks= getTasksFromTime(scanner, toDoList);
                 for (Task t : tasks){
                     System.out.println(t.getName());
                 }
             }
             if (operation.equals("5")){
-                String s = newToDoListManager.printUrgency(scanner);
+                String s = printUrgency(scanner);
                 try {
-                    for (int i = 0; i < searchImptLvl.get(s).size(); i++) {
-                        System.out.println(searchImptLvl.get(s).get(i));
-                    }
+                    printLevelMap(s);
                 }
                 catch (NullPointerException n){
                     System.out.println("There are no existing tasks with the chosen urgency!");}
@@ -88,24 +85,23 @@ public class ToDoListRun{
                 break;
             }
 
-
         }
         try {
-            newToDoListManager.save1(toDoList, FILE);
-            newToDoListManager.saveMap(searchImptLvl, FILE);
+            save(toDoList, FILE);
+            saveMap();
         }catch (NullOutputException nullOutputException) {
             nullOutputException.printStackTrace();
             System.out.println("\nNo FILE exists!");
         }
         finally {
             System.out.println("\n      -----Have a productive day!-----");
-            newToDoListManager.printStatement(toDoList);
+            printStatement(toDoList);
         }
 
     }
 
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
     new ToDoListRun();
 
 }
