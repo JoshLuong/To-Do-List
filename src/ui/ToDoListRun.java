@@ -6,9 +6,7 @@ import exceptions.AlreadyInList;
 import exceptions.EmptyTaskException;
 import exceptions.NoTaskFoundException;
 import exceptions.NullOutputException;
-import model.EstCompletionTime;
-import model.SaveAndLoad;
-import model.Task;
+import model.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,8 +26,8 @@ public class ToDoListRun extends ToDoListManager{
         while (true){
 
 //            ToDoListManager newToDoListManager = new ToDoListManager();
-
-            System.out.println("\n\n                                     ------Welcome to 'Task Manager'------");
+            System.out.println("\n----------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("                                         ------Welcome to 'Task Manager'------");
             System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times, [5] find a task based on urgency");
             System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
             operation = scanner.nextLine();
@@ -54,7 +52,6 @@ public class ToDoListRun extends ToDoListManager{
             if (operation.equals("2")) {
                 try {
                     crossOff(scanner, toDoList);
-                    System.out.println("The task was crossed off the to-do list!");
                 } catch (NoTaskFoundException e) {
                     System.out.println("There was no task found in the list!");
                 }

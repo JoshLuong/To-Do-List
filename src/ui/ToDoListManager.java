@@ -5,12 +5,14 @@ import exceptions.EmptyTaskException;
 import exceptions.NoTaskFoundException;
 import exceptions.NullOutputException;
 import model.*;
+import observer.Subject;
 
 import java.io.*;
 import java.util.*;
 
 
-public class ToDoListManager {
+public class ToDoListManager extends Subject {
+    protected Weather weather = new Weather();
     private SaveAndLoad saveAndLoad = new SaveAndLoad();
     protected List<EstCompletionTime> times = new ArrayList<>();
     private ImportanceLevelMapManager importanceLevelMapManager;
@@ -35,7 +37,6 @@ public class ToDoListManager {
     protected Map<String, Task> load(String output, List<EstCompletionTime> timeList) throws IOException {
         return saveAndLoad.load(output,timeList);
     }
-
 
 
 //    public void saveTimes(List<EstCompletionTime> times, String output) throws IOException, NullOutputException {
@@ -82,6 +83,7 @@ public class ToDoListManager {
             throw new AlreadyInList();
         }
         toDoList.put(task.getName(), task);
+        addObserver(task);
         return task;
     }
 
@@ -107,26 +109,25 @@ public class ToDoListManager {
         System.out.println("Please enter the task completed");
         String search = scanner.nextLine();
         if (toDoList.containsKey(search)){
+            notifyObservers(toDoList.get(search));
             toDoList.get(search).getTime().getTasks().remove(toDoList.get(search));
             removeTaskFromLevelMap(toDoList, search);
             toDoList.remove(search);
         }
         else throw new NoTaskFoundException();
-
-    }
-
-    private void removeTaskFromLevelMap(Map<String, Task> toDoList, String search) {
-        importanceLevelMapManager.removeTaskFromLevelMap(toDoList,search);
     }
 
     public void printLevelMap(String s) {
         importanceLevelMapManager.printLevelMap(s);
 
     }
+    public void addToMap(Task t){
+        importanceLevelMapManager.addToMap(t);
+    }
 
     // MODIFIES: this
     // EFFECTS: prints out toDoList
-    public void printStatement(Map<String, Task> toDoList){
+    public void printStatement(Map<String, Task> toDoList) throws IOException {
         if (toDoList.size() == 0){
             System.out.println("Good job, you've finished all the tasks!");
         }
@@ -135,6 +136,7 @@ public class ToDoListManager {
         for (Task t : sortedList){
             printTask(t);
         }
+        System.out.println("The weather is currently "+weather.getWeather()+". . . perfect weather to be productive!");
     }
 
 
@@ -153,7 +155,7 @@ public class ToDoListManager {
 
 
     // TODO COUPLING
-    public void printList(Scanner scanner, ArrayList<Task> sortedList, Map<String, Task> toDoList){
+    public void printList(Scanner scanner, ArrayList<Task> sortedList, Map<String, Task> toDoList) throws IOException {
         boolean done = false;
         Task rt = new RegularTask("","");
         Task st = new SchoolTask("","");
@@ -210,10 +212,26 @@ public class ToDoListManager {
 
     }
 
-    public void addToMap(Task t){
-       importanceLevelMapManager.addToMap(t);
+    public Task setTask(List<EstCompletionTime> timeList, String newTask, String type, String t, String lvl) {
+        Task task = null;
+        EstCompletionTime time = null;
+        if (type.equals("Regular")){
+            time = new EstCompletionTime(t);
+            task = new RegularTask(newTask, lvl);
+        }
+        if (type.equals("School")){
+            time = new EstCompletionTime(t);
+            task = new SchoolTask(newTask, lvl);}
+
+        String day = time.getDay();
+        addTimeAndTask(timeList, task, day);
+        return task;
     }
 
+
+    private void removeTaskFromLevelMap(Map<String, Task> toDoList, String search) {
+        importanceLevelMapManager.removeTaskFromLevelMap(toDoList,search);
+    }
 
     private String getNewLevel(String newTask, Scanner scanner){
         String actualLevel= "";
@@ -291,6 +309,21 @@ public class ToDoListManager {
 
     private void addTimeAndTask(List<EstCompletionTime> timeList, Task task, String day) {
         boolean b = true;
+//        if (b) {
+//            for (EstCompletionTime t : timeList) {
+//                if (t.getDay().equals(day)) {
+//                    t.addTask(task);
+//                    task.addTime(t);
+//                    b = false;
+//                }
+//            }        }
+//         if (b) {
+//            EstCompletionTime time = new EstCompletionTime(day);
+//            time.addTask(task);
+//            task.addTime(time);
+//            timeList.add(time);
+//
+//        }
         while (true && b) {
             for (EstCompletionTime t : timeList) {
                 if (t.getDay().equals(day)) {
@@ -308,23 +341,6 @@ public class ToDoListManager {
             timeList.add(time);
             b = false;
         }
-
-    }
-
-    public Task setTask(List<EstCompletionTime> timeList, String newTask, String type, String t, String lvl) {
-        Task task = null;
-        EstCompletionTime time = null;
-        if (type.equals("Regular")){
-            time = new EstCompletionTime(t);
-            task = new RegularTask(newTask, lvl);
-        }
-        if (type.equals("School")){
-            time = new EstCompletionTime(t);
-            task = new SchoolTask(newTask, lvl);}
-
-        String day = time.getDay();
-        addTimeAndTask(timeList, task, day);
-        return task;
     }
 
     private void sortTasks(Collection<Task> list, ArrayList<Task> newList, String urgent) {
@@ -337,9 +353,5 @@ public class ToDoListManager {
     private void printTask(Task t) {
         System.out.println(t.getImportanceLvl()+". . ." +t.getName());
     }
-
-
-
-
 
 }

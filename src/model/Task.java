@@ -1,9 +1,11 @@
 package model;
 
+import observer.ToDoListObserver;
+
 import java.io.Serializable;
 import java.util.Objects;
-
-public abstract class Task implements Serializable {
+// delegration: having a field of that type to do something
+public abstract class Task implements ToDoListObserver {
     protected String name;
     protected String importanceLvl;
     protected String type;
@@ -61,6 +63,20 @@ public abstract class Task implements Serializable {
     public int hashCode() {
 
         return Objects.hash(name);
+    }
+
+    @Override
+    public void update(Task task) {
+        if (task.getName().equals(this.name)) {
+            crossOffPrint(task);
+        }
+        else {
+            crossOffPrint(task);
+            System.out.println("\t"+this.name +" remains in the list");}
+    }
+
+    private void crossOffPrint(Task task) {
+        System.out.println(task.getName() + " has been crossed off the to-do list!");
     }
 
     // Abstract method
