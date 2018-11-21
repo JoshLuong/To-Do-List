@@ -14,91 +14,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 public class ToDoListRun extends JFrame  implements ActionListener {
+
     private ToDoListManager toDoListManager = new ToDoListManager();
     private final String FILE = "outputfile.txt";
     private Scanner scanner = new Scanner(System.in);
     private Map<String, Task> toDoList = toDoListManager.load("outputfile.txt", toDoListManager.times);
 
 
-//    private ToDoListRun() throws IOException{
-//        String operation;
-//
-//        while (true){
-//
-//            System.out.println("\n----------------------------------------------------------------------------------------------------------------------------------");
-//            System.out.println("                                         ------Welcome to 'Task Manager'------");
-//            System.out.println("Please select an option: [1] to-do, [2] cross-off, [3] print sorted to-do list, [4] check times, [5] find a task based on urgency");
-//            System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
-//            operation = scanner.nextLine();
-//
-//
-//
-//            if (operation.equals("1")) {
-//                try {
-//                     Task t = addTask(scanner, toDoList);
-//                     addToMap(t);
-//                    System.out.println("you added "+t.getName()+" to the to-do list!");
-//
-//                } catch (AlreadyInList alreadyInList) {
-//                    System.out.println("This task is already in the list!");
-//
-//                } catch (EmptyTaskException emptyTaskException){
-//                    System.out.println("You cannot add an empty task!");
-//                }
-//
-//            }
-//
-//            if (operation.equals("2")) {
-//                try {
-//                    crossOff(scanner, toDoList);
-//                } catch (NoTaskFoundException e) {
-//                    System.out.println("There was no task found in the list!");
-//                }
-//
-//            }
-//            if (operation.equals("3")) {
-//                ArrayList<Task> sortedList = sortedList(toDoList);
-//                printList(scanner, sortedList, toDoList);
-//            }
-//
-//            if (operation.equals("4")){
-//                Collection<Task> tasks= getTasksFromTime(scanner, toDoList);
-//                for (Task t : tasks){
-//                    System.out.println(t.getName());
-//                }
-//            }
-//            if (operation.equals("5")){
-//                String s = printUrgency(scanner);
-//                try {
-//                    printLevelMap(s);
-//                }
-//                catch (NullPointerException n){
-//                    System.out.println("There are no existing tasks with the chosen urgency!");}
-//                }
-//
-//
-//            else if (operation.equals("quit")) {
-//                break;
-//            }
-//
-//        }
-//        try {
-//            save(toDoList, FILE);
-//            saveMap();
-//        }catch (NullOutputException nullOutputException) {
-//            nullOutputException.printStackTrace();
-//            System.out.println("\nNo FILE exists!");
-//        }
-//        finally {
-//            System.out.println("\n      -----Have a productive day!-----");
-//            printStatement(toDoList);
-//        }
-//
-//
-//    }
     private JLabel label;
     private JLabel output;
     private JTextField field;
@@ -109,9 +35,9 @@ public class ToDoListRun extends JFrame  implements ActionListener {
 
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(400, 500));
+        setPreferredSize(new Dimension(400, 700));
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(13, 13, 13, 13) );
-        setLayout(new FlowLayout());
+        setLayout(null);
 
 
 
@@ -131,22 +57,38 @@ public class ToDoListRun extends JFrame  implements ActionListener {
         //this.actionPerformed(ActionEvent e) will be called.
         //You could also set a different class, if you wanted
         //to capture the response behaviour elsewhere
-        label = new JLabel("");
+        label = new JLabel("What would you like to do?");
         output = new JLabel();
-        // label.add(textArea);
         field = new JTextField(5);
-        list = new JTextArea(24,30);
+        list = new MyTextArea(24,30);
+        JTextArea up = new MyTextArea(24,30);
         StringBuilder str = getStringBuilder();
+        Font font1 = new Font("Bradley Hand ITC", Font.BOLD, 20);
+
 
         list.setText(str.toString());
         add(field);
+        field.setBounds(50,50,300,30);
+        btn.setBounds(40,80,150,40);
         add(btn);
         add(schoolBtn);
+        schoolBtn.setBounds(210,80,150,40);
         add(crossOffBtn);
+        crossOffBtn.setBounds(120,120,150,40);
         add(label);
+        add(up);
+        up.setBounds(0,0,400,170);
+        up.setEditable(false);
+        label.setBounds(50,15,300,30);
+        label.setFont(font1);
         output.add(list);
         add(output);
         add(list);
+        list.setBounds(0,170,400,500);
+        list.setFont(font1);
+        list.setBackground(new Color(1,1,1, (float) 0.01));
+        up.setBackground(new Color(1,1,1, (float) 0.01));
+        list.setEditable(false);
 
         pack();
         setLocationRelativeTo(null);
@@ -156,11 +98,32 @@ public class ToDoListRun extends JFrame  implements ActionListener {
 
     private StringBuilder getStringBuilder() {
         StringBuilder str = new StringBuilder();
+        ArrayList<Task> school = new ArrayList<>();
+        ArrayList<Task> regular = new ArrayList<>();
         for (String key : toDoList.keySet()) {
-            str.append(key)
-                    .append(". . .")
-                    .append(toDoList.get(key).getTime().getDay())
+            if (toDoList.get(key).getType().equals("School")) {
+                school.add(toDoList.get(key));
+            }
+            else {
+                regular.add(toDoList.get(key));
+            }
+        }
+        str.append("\tMy Task Manager\n");
+        str.append("SCHOOL TASKS:\n\n");
+        for (Task t : school){
+            str.append("\t"+t.getName())
+                    .append(" on ")
+                    .append(t.getTime().getDay()+"!")
                     .append("\n");
+
+        }
+        str.append("\n\nREGULAR TASKS:\n\n");
+        for (Task t : regular){
+            str.append("\t"+t.getName())
+                    .append(" on ")
+                    .append(t.getTime().getDay()+"!")
+                    .append("\n");
+
         }
         return str;
     }
@@ -175,20 +138,25 @@ public class ToDoListRun extends JFrame  implements ActionListener {
             try {
                 ArrayList<String> str = splitOnSpace(field.getText());
 
-                     Task t = toDoListManager.addTask(scanner, toDoList, str.get(0), "Regular", str.get(1), str.get(2));
+                     Task t = toDoListManager.addTask(scanner, toDoList, str.get(0), "Regular", str.get(1), "urgent");
                      toDoListManager.addToMap(t);
+                     label.setText("You've added "+t.getName()+" to the To-Do List!");
 
                 } catch (AlreadyInList alreadyInList) {
+                label.setText("This task is already in the To-Do List!");
 
                 } catch (EmptyTaskException emptyTaskException){
+                label.setText("You cannot add an empty task!");
                 }
 
             }
             if (e.getActionCommand().equals("crossOff")){
                 try {
                     toDoListManager.crossOff(scanner, toDoList, field.getText());
+                    label.setText("You've crossed off "+field.getText());
 
                 } catch (NoTaskFoundException e1) {
+                    label.setText("There was no task found!");
                 }
 
             }
@@ -196,18 +164,19 @@ public class ToDoListRun extends JFrame  implements ActionListener {
 
         else {
             try {
-                label.setText(field.getText());
                 ArrayList<String> str = splitOnSpace(field.getText());
 
-                Task t = toDoListManager.addTask(scanner, toDoList, str.get(0), "School", str.get(1), str.get(2));
+                Task t = toDoListManager.addTask(scanner, toDoList, str.get(0), "School", str.get(1), "urgent");
                 toDoListManager.addToMap(t);
 
             } catch (AlreadyInList alreadyInList) {
+                label.setText("This task is already in the To-Do List!");
 
             } catch (EmptyTaskException emptyTaskException){
+                label.setText("You cannot add an empty task!");
             }
 
-        }
+            }
         StringBuilder str = getStringBuilder();
         list.setText(str.toString());
         try {

@@ -65,17 +65,18 @@ public class ToDoListManager extends Subject {
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
-    public  Task addTask(Scanner scanner, Map<String, Task> toDoList, String newTask, String type, String t, String lvl) throws AlreadyInList, EmptyTaskException {
+    public  Task addTask(Scanner scanner, Map<String, Task> toDoList,String newTask, String type, String t, String lvl) throws AlreadyInList, EmptyTaskException {
+
         Task task;
-        //System.out.println("Please enter the task to do");
-        //String newTask = scanner.nextLine();
-//        if(newTask.equals("")| newTask.equals(" ")){
-//            throw new EmptyTaskException();
-//        }
-        //String type = selectType(scanner);
-        //String t = dayScanner(scanner);
-        //scanner.nextLine();
-        //String lvl = getNewLevel(newTask, scanner);
+
+        if(newTask.equals("")| newTask.equals(" ")){
+            throw new EmptyTaskException();
+        }
+
+//        String type = selectType(scanner);
+//        String t = dayScanner(scanner);
+//        scanner.nextLine();
+//        String lvl = getNewLevel(newTask, scanner);
 // TODO COUPLING
         task = setTask(times, newTask, type, t, lvl);
 
@@ -88,23 +89,34 @@ public class ToDoListManager extends Subject {
     }
 
 
-    protected Collection<Task> getTasksFromTime(Scanner scanner, Map<String, Task> tasks){
-        HashSet<Task> tasks1= new HashSet<>();
-        Collection<Task> List = tasks.values();
-        String time = dayScanner(scanner);
-        scanner.nextLine();
-        for (Task t : List){
-            if (t.getTime().getDay().equals(time)){
-                tasks1.addAll(t.getTime().getTasks());
-            }
-        }
-
-        return tasks1;
-
-    }
+//    protected Collection<Task> getTasksFromTime(Scanner scanner, Map<String, Task> tasks){
+//        HashSet<Task> tasks1= new HashSet<>();
+//        Collection<Task> List = tasks.values();
+//        String time = dayScanner(scanner);
+//        scanner.nextLine();
+//        for (Task t : List){
+//            if (t.getTime().getDay().equals(time)){
+//                tasks1.addAll(t.getTime().getTasks());
+//            }
+//        }
+//
+//        return tasks1;
+//
+//    }
 
     // MODIFIES: this
     // EFFECTS: takes out completed task from toDoList, unless not there
+//    protected void crossOff(Scanner scanner, Map<String, Task> toDoList) throws NoTaskFoundException {
+//        System.out.println("Please enter the task completed");
+//        String search = scanner.nextLine();
+//        if (toDoList.containsKey(search)){
+//            notifyObservers(toDoList.get(search));
+//            toDoList.get(search).getTime().getTasks().remove(toDoList.get(search));
+//            removeTaskFromLevelMap(toDoList, search);
+//            toDoList.remove(search);
+//        }
+//        else throw new NoTaskFoundException();
+//    }
     protected void crossOff(Scanner scanner, Map<String, Task> toDoList, String search) throws NoTaskFoundException {
         if (toDoList.containsKey(search)){
             notifyObservers(toDoList.get(search));
