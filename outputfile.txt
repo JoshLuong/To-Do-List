@@ -1,2 +1,3 @@
 shop shop urgent Regular SUNDAY
+notes notes medium School WEDNESDAY
 homework homework urgent School MONDAY
