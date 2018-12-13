@@ -8,12 +8,6 @@ public class SchoolTask extends Task {
     }
 
 
-    @Override
-    //EFFECTS: returns string specific to SchoolTask
-    public String done() {
-        return "\nYou've finished all of your homework, NERD!";
-
-    }
 
 
 

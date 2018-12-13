@@ -10,11 +10,5 @@ public class RegularTask extends Task {
     }
 
 
-    @Override
-    //EFFECTS: returns string specific to RegularTask
-    public String done() {
-        return "\nYou've completed all of your regular tasks!";
-    }
-
 
 }

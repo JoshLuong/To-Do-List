@@ -14,11 +14,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 public class ToDoListRun extends JFrame  implements ActionListener {
-//
+
     private ToDoListManager toDoListManager = new ToDoListManager();
     private final String FILE = "outputfile.txt";
     private Scanner scanner = new Scanner(System.in);
@@ -33,6 +32,7 @@ public class ToDoListRun extends JFrame  implements ActionListener {
     private JTextArea list;
     private  JComboBox<String> comboBox;
     private JComboBox<String> dayComboBox;
+    private Weather w = new Weather();
     public ToDoListRun() throws IOException {
 
         super("The 'Task Manager'");
@@ -105,6 +105,8 @@ public class ToDoListRun extends JFrame  implements ActionListener {
         topWindowBackground.setEditable(false);
         label.setBounds(50,15,300,30);
         label.setFont(font1);
+
+
 
         add(output);
         output.add(list);

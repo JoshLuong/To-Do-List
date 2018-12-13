@@ -12,7 +12,6 @@ import java.util.*;
 
 
 public class ToDoListManager extends Subject {
-    protected Weather weather = new Weather();
     private SaveAndLoad saveAndLoad = new SaveAndLoad();
     protected List<EstCompletionTime> times = new ArrayList<>();
     private ImportanceLevelMapManager importanceLevelMapManager;
@@ -39,28 +38,7 @@ public class ToDoListManager extends Subject {
     }
 
 
-//    public void saveTimes(List<EstCompletionTime> times, String output) throws IOException, NullOutputException {
-//
-//        PrintWriter writer = new PrintWriter("times.txt", "UTF-8");
-//        for (EstCompletionTime t : times) {
-//            List<String> lines = Files.readAllLines(Paths.get("times.txt"));
-//            lines.add(t.getDay() + " " + getTasksFromList(t.getTasks()));
-//
-//            for (String line : lines) {
-//                writer.println(line);
-//            }
-//        }
-//        writer.close();
-//    }
 
-//    private StringBuilder getTasksFromList(ArrayList<Task> tasks){
-//        StringBuilder sb = new StringBuilder();
-//        for (Task t: tasks){
-//            sb.append(t.getName() + " " + t.getImportanceLvl()+" " +t.getType()+ " "+t.getTime().getDay());
-//
-//        }
-//        return sb;
-//    }
 
     // REQUIRES: Task is not already in the to-doList
     // MODIFIES: this
@@ -170,9 +148,6 @@ public class ToDoListManager extends Subject {
                 newList.add(t);
             }
         }
-    }
-    private void printTask(Task t) {
-        System.out.println(t.getImportanceLvl()+". . ." +t.getName());
     }
 
 }

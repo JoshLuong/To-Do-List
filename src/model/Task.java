@@ -4,7 +4,6 @@ import observer.ToDoListObserver;
 
 import java.io.Serializable;
 import java.util.Objects;
-// delegration: having a field of that type to do something
 public abstract class Task implements ToDoListObserver {
     protected String name;
     protected String importanceLvl;
@@ -79,7 +78,5 @@ public abstract class Task implements ToDoListObserver {
         System.out.println(task.getName() + " has been crossed off the to-do list!");
     }
 
-    // Abstract method
-    public abstract String done();
 
 }
