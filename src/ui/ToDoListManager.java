@@ -44,13 +44,16 @@ public class ToDoListManager extends Subject {
     // MODIFIES: this
     // EFFECTS: makes a new Task with an importance level and name
     public  Task addTask(Scanner scanner, Map<String, Task> toDoList,String newTask, String type, String t, String lvl) throws AlreadyInList, EmptyTaskException {
-
+        TaskFactory tf = new TaskFactory();
         Task task;
-
+        EstCompletionTime time = new EstCompletionTime(t);
         if(newTask.equals("")| newTask.equals(" ")){
             throw new EmptyTaskException();
         }
-        task = setTask(times, newTask, type, t, lvl);
+        //task = setTask(times, newTask, type, t, lvl);
+        task = tf.makeTask(newTask, type, lvl);
+        String day = time.getDay();
+        addTimeAndTask(times, task, day);
 
         if (isSameInList(task, toDoList)){
             throw new AlreadyInList();
@@ -94,14 +97,9 @@ public class ToDoListManager extends Subject {
 
     public Task setTask(List<EstCompletionTime> timeList, String newTask, String type, String t, String lvl) {
         Task task = null;
-        EstCompletionTime time = null;
-        if (type.equals("Regular")){
-            time = new EstCompletionTime(t);
-            task = new RegularTask(newTask, lvl);
-        }
-        if (type.equals("School")){
-            time = new EstCompletionTime(t);
-            task = new SchoolTask(newTask, lvl);}
+        EstCompletionTime time = new EstCompletionTime(t);
+        TaskFactory tf = new TaskFactory();
+        task = tf.makeTask(newTask, type, lvl);
 
         String day = time.getDay();
         addTimeAndTask(timeList, task, day);
